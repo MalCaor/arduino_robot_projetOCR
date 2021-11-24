@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+	<meta charset="utf-8">
+	<title>Robot L3 - Octobre 2021</title>
+
+
+
+	<script type="text/javascript" charset="utf-8">
+
+		function cmd(c) {
+			fetch("cmd", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+
+				body: JSON.stringify({
+					cmd: c
+				})
+			}).then(res => res.json())
+			.then(res => {
+				console.log("res = "+res.mess)
+				document.getElementById("dist_mm").innerHTML = res.mess
+			})
+
+		}
+
+
+		setTimeout(() => {
+			check()
+		}, 1000);
+
+		function check() {
+			cmd('nop')
+			setTimeout(() => {
+				check()
+			}, 1000);
+
+		}
+	</script>
+
+
+</head>
+
+<body>
+
+
+	<table>
+		<tr>
+			<td>Dist (mm) : </td>
+			<td id="dist_mm"></td>
+		</tr>
+		<tr>
+			<td>Dist (rate) : </td>
+			<td id="dist_rate"></td>
+		</tr>
+		<tr>
+			<td>Dist (stat) : </td>
+			<td id="dist_status"></td>
+		</tr>
+	</table>
+	<br><br>
+	<input type="submit" value="Stop" onclick="cmd('stop')">
+	<br><br>
+	<input type="submit" value="Avancer" onclick="cmd('avancer')">
+
+
+
+
+</body>
+
+</html>
