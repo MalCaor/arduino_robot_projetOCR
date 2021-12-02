@@ -92,7 +92,10 @@ usb.setCallback( function(s) {
                 }else{
                     mission = droite
                 }
-            }else{
+            }else if(etat.dist[7] < 130){
+                console.log("recule")
+                mission = recule
+            } else {
                 console.log("Toupie")
                 mission = toupie
             }
