@@ -4,6 +4,8 @@
 
 // exemple pour faire avancer et recu
 
+var toupiecompt = 0
+
 // port du serveur Web
 var port_web = 3000
 
@@ -55,25 +57,25 @@ usb.setCallback( function(s) {
                 //  \ 
                 // O \
                 console.log("Penché droit")
-                gauche()
+                mission = gauche
             }else if(etat.dist[7] < 250 && etat.dist[10] < 200 && etat.dist[13] < 250){
                 //   /
                 //  / 
                 // / O  
                 console.log("Penché gauche")
-                droite()
+                mission = droite
             } else if(etat.dist[1] < 250){
                 //   |
                 // O |
                 //   |
                 console.log("Coté droit")
-                avance()
+                mission = avance
             } else if(etat.dist[13] < 250){
                 // | 
                 // | O
                 // |  
                 console.log("Coté gauche")
-                avance()
+                mission = avance
             } else if(etat.dist[4] < 250 && etat.dist[7] < 200 && etat.dist[10] < 250){
                 // _____
                 //   O
@@ -81,22 +83,24 @@ usb.setCallback( function(s) {
                 console.log("Face")
                 if(etat.dist[1] <= etat.dist[13])
                 {
-                    gauche()
+                    mission = gauche
                 }else{
-                    droite()
+                    mission = droite
                 }
             }else{
                 console.log("Toupie")
+                mission = toupie
             }
+            console.log("Effectue Mission")
             if (mission != null) mission(); // chaque fois qu'on reçoit une réponse de l'Arduino, on relance la mission
-        
+            
         }
 
         chunk = ""
          
     }
      // note : il faudrait prévoir le cas où l'Arduino ne répond plus
- 
+    voir_autour_soit()
 })
 
 
@@ -159,7 +163,7 @@ setTimeout(() => {
     //mission = aligner; // on va exécuter la fonction aligner
     cmd_num = 0    // numéro de la séquence courante
     mission()
-    mission = null
+    //mission = null
 }, 5000);
 
 ////////////////////////////////// custom mission /////////////////////////////////
@@ -175,26 +179,36 @@ function voir_autour_soit() {
 function avance(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 200][mda 200][t 1000]]")
+    usb.write("[[mga 120][mda 120]]")
     //mission = null
     console.log("mission avance terminée")
-    return
 }
 
 function gauche(){
     time = Date.now();
     num = 0
-    usb.write("[[mda 200][t 1000]]")
+    usb.write("[[mda 120]]")
     //mission = null
     console.log("mission gauche terminée")
-    return
 }
 
 function droite(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 200][t 1000]]")
+    usb.write("[[mga 120]]")
     //mission = null
     console.log("mission droite terminée")
-    return
+}
+function toupie(){
+    if(toupiecompt>2) {
+        toupiecompt = 0
+        avance()
+    } else{
+        toupiecompt = toupiecompt +1
+        time = Date.now();
+        num = 0
+        usb.write("[[mga 120]]")
+        //mission = null
+        console.log("mission Toupie terminée")
+    }
 }
