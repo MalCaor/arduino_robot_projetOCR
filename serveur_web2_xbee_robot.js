@@ -11,13 +11,15 @@ var port_web = 3000
 
 // à modifier !!!!!!
 // dossier contenant les fichiers HTML que le serveur Web pourra envoyer au navigateur
-var rep_html = "/home/malcaor/Prog/OCR/site/index.html"
+//var rep_html = "/home/malcaor/Prog/OCR/site/index.html"
+var rep_html = "C:\Users\msi\Documents\L3 Confinement\OCR\arduino_robot_projetOCR"
 
 
 var fs = require('fs')
 var express = require('express')
 var usb = require("./usb.js")
 const { setTimeout } = require('timers')
+const { Console } = require('console')
 
 var time = null;
 
@@ -52,7 +54,10 @@ usb.setCallback( function(s) {
                 console.log("angle : " + etat.dist[index])
                 console.log("dist : " + etat.dist[index+1])
             }
-            if(etat.dist[1] < 250 && etat.dist[4] < 200 && etat.dist[7] < 250){
+            if(etat.dist[7] <= 130){
+                console.log("Recule")
+                mission = recule
+            }else if(etat.dist[1] < 250 && etat.dist[4] < 200 && etat.dist[7] < 250){
                 // \
                 //  \ 
                 // O \
@@ -179,7 +184,7 @@ function voir_autour_soit() {
 function avance(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 120][mda 120]]")
+    usb.write("[[mga 130][mda 130][t 500]]")
     //mission = null
     console.log("mission avance terminée")
 }
@@ -187,7 +192,7 @@ function avance(){
 function gauche(){
     time = Date.now();
     num = 0
-    usb.write("[[mda 120]]")
+    usb.write("[[mda 130]]")
     //mission = null
     console.log("mission gauche terminée")
 }
@@ -195,7 +200,7 @@ function gauche(){
 function droite(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 120]]")
+    usb.write("[[mga 130]]")
     //mission = null
     console.log("mission droite terminée")
 }
@@ -207,8 +212,17 @@ function toupie(){
         toupiecompt = toupiecompt +1
         time = Date.now();
         num = 0
-        usb.write("[[mga 120]]")
+        usb.write("[[mga 130]]")
         //mission = null
         console.log("mission Toupie terminée")
     }
+}
+
+function recule(){
+    time = Date.now();
+    num = 0
+    usb.write("[[mgr 130][mdr 130]]")
+    //mission = null
+    console.log("mission recule terminée")
+
 }
