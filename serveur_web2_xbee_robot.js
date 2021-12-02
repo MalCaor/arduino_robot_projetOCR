@@ -87,7 +87,10 @@ usb.setCallback( function(s) {
                 }else{
                     mission = droite
                 }
-            }else{
+            }else if(etat.dist[7] < 130){
+                console.log("recule")
+                mission = recule
+            } else {
                 console.log("Toupie")
                 mission = toupie
             }
@@ -211,4 +214,11 @@ function toupie(){
         //mission = null
         console.log("mission Toupie terminée")
     }
+}
+function recule(){
+    time = Date.now();
+    num = 0
+    usb.write("[[mgr 120][mdr 120]]")
+    //mission = null
+    console.log("mission recule terminée")
 }
