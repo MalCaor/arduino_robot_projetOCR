@@ -54,34 +54,59 @@ usb.setCallback( function(s) {
                 console.log("angle : " + etat.dist[index])
                 console.log("dist : " + etat.dist[index+1])
             }
+
             if(etat.dist[7] <= 130){
                 console.log("Recule")
                 mission = recule
-            }else if(etat.dist[1] < 250 && etat.dist[4] < 200 && etat.dist[7] < 250){
+            }else if(etat.dist[1] < 500 && etat.dist[4] < 450 && etat.dist[7] < 500){
                 // \
                 //  \ 
                 // O \
                 console.log("Penché droit")
                 mission = gauche
-            }else if(etat.dist[7] < 250 && etat.dist[10] < 200 && etat.dist[13] < 250){
+            }else if(etat.dist[7] < 500 && etat.dist[10] < 450 && etat.dist[13] < 500){
                 //   /
                 //  / 
                 // / O  
                 console.log("Penché gauche")
                 mission = droite
-            } else if(etat.dist[1] < 250){
+            } else if(etat.dist[1] < 500){
                 //   |
                 // O |
                 //   |
                 console.log("Coté droit")
                 mission = avance
-            } else if(etat.dist[13] < 250){
+            } else if(etat.dist[13] < 500){
                 // | 
                 // | O
                 // |  
                 console.log("Coté gauche")
                 mission = avance
-            } else if(etat.dist[4] < 250 && etat.dist[7] < 200 && etat.dist[10] < 250){
+            } else if(etat.dist[1] < 700 && etat.dist[4] < 600 && etat.dist[7] < 700){
+                // \
+                //  \ 
+                // O \
+                console.log("Penché droit")
+                mission = gauche
+            }else if(etat.dist[7] < 700 && etat.dist[10] < 600 && etat.dist[13] < 700){
+                //   /
+                //  / 
+                // / O  
+                console.log("Penché gauche")
+                mission = droite
+            } else if(etat.dist[1] < 700){
+                //   |
+                // O |
+                //   |
+                console.log("Coté droit")
+                mission = avance
+            } else if(etat.dist[13] < 700){
+                // | 
+                // | O
+                // |  
+                console.log("Coté gauche")
+                mission = avance
+            } else if(etat.dist[4] < 500 && etat.dist[7] < 450 && etat.dist[10] < 500){
                 // _____
                 //   O
                 //  
@@ -92,10 +117,7 @@ usb.setCallback( function(s) {
                 }else{
                     mission = droite
                 }
-            }else if(etat.dist[7] < 130){
-                console.log("recule")
-                mission = recule
-            } else {
+            }else {
                 console.log("Toupie")
                 mission = toupie
             }
@@ -195,7 +217,7 @@ function avance(){
 function gauche(){
     time = Date.now();
     num = 0
-    usb.write("[[mda 130]]")
+    usb.write("[[mda 150][mga 130]]")
     //mission = null
     console.log("mission gauche terminée")
 }
@@ -203,12 +225,29 @@ function gauche(){
 function droite(){
     time = Date.now();
     num = 0
+    usb.write("[[mga 150][mda 130]]")
+    //mission = null
+    console.log("mission droite terminée")
+}
+
+function gauche2(){
+    time = Date.now();
+    num = 0
+    usb.write("[[mda 130]]")
+    //mission = null
+    console.log("mission gauche terminée")
+}
+
+function droite2(){
+    time = Date.now();
+    num = 0
     usb.write("[[mga 130]]")
     //mission = null
     console.log("mission droite terminée")
 }
+
 function toupie(){
-    if(toupiecompt>2) {
+    if(toupiecompt>1) {
         toupiecompt = 0
         avance()
     } else{
@@ -225,6 +264,7 @@ function recule(){
     time = Date.now();
     num = 0
     usb.write("[[mgr 130][mdr 130]]")
+    droite2()
     //mission = null
     console.log("mission recule terminée")
 }

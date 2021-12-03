@@ -1,7 +1,8 @@
 
 var SerialPort = require("serialport");
 
-var tty = "/dev/ttyACM0"
+//var tty = "/dev/ttyACM0"
+var tty = "COM5"
 
 var chunk = ""
 
