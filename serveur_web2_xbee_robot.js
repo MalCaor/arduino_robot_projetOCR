@@ -227,5 +227,4 @@ function recule(){
     usb.write("[[mgr 130][mdr 130]]")
     //mission = null
     console.log("mission recule terminée")
-
 }
