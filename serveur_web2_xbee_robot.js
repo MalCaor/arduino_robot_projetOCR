@@ -165,7 +165,7 @@ function wait(){
 function voir_autour_soit() {
     time = Date.now();
     num = 0
-    usb.write("[[bl 0][t 1000]]")
+    usb.write("[[bl 0]]")
     //mission = null
     console.log("mission voir_autour_soit terminée")
     return
@@ -174,7 +174,7 @@ function voir_autour_soit() {
 function avance(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 170][mda 170][t 1000]]")
+    usb.write("[[mga 170][mda 170],[t 1000]]")
     //mission = null
     console.log("mission avance terminée")
     //wait()
