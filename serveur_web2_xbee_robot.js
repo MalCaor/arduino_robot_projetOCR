@@ -4,11 +4,10 @@
 
 // exemple pour faire avancer et recu
 
-var toupiecompt = 0
 var reculecompte = 0
-var tourne=0
-var suivreCoteGauche = false// suis le mur a gauche du robot
-var suivreCoteDroit = true // suis le mur a droite du robot
+var soustractionGauche=0
+var soustractionDroite=0
+
 
 // port du serveur Web
 var port_web = 3000
@@ -16,7 +15,7 @@ var port_web = 3000
 // à modifier !!!!!!
 // dossier contenant les fichiers HTML que le serveur Web pourra envoyer au navigateur
 //var rep_html = "/home/malcaor/Prog/OCR/site/index.html"
-var rep_html = "C:\Users\msi\Documents\L3 Confinement\OCR\arduino_robot_projetOCR"
+var rep_html = "C:/Users/msi/Documents/L3 Confinement/OCR/arduino_robot_projetOCR/index.html"
 
 
 var fs = require('fs')
@@ -33,7 +32,6 @@ var etat = null;    // dernière réponse de l'Arduino
 
 var chunk = ""; // on reçoit la réponse de l'Arduino par morceaux
 
-var grandEspace = false; //true si le robot évolue dans un environnement vaste, false si c'est un 9m²
 
 usb.setCallback( function(s) {
 
@@ -68,69 +66,14 @@ usb.setCallback( function(s) {
             if(etat.dist[7] <= 130){
                 console.log("----------Recule")
                 mission = recule
-            }else if(etat.dist[1] < 500 && etat.dist[4] < 450 && etat.dist[7] < 500 && suivreCoteDroit){
-                // \
-                //  \ 
-                // O \
-                console.log("----------Penché droit")
-                mission = gauche
-            }else if(etat.dist[7] < 500 && etat.dist[10] < 450 && etat.dist[13] < 500 && suivreCoteGauche){
-                //   /
-                //  / 
-                // / O  
-                console.log("----------Penché gauche")
+            }else if(etat.dist[1]<etat.dist[13]){
+                console.log("----------Cote Droit")
+                soustractionDroite=etat.dist[4]-etat.dist[1]
                 mission = droite
-            } else if(etat.dist[1] < 700 && etat.dist[4] < 600 && etat.dist[7] < 700 && grandEspace && suivreCoteDroit){//-----------------------------LOIN---------------------------
-                // \
-                //  \ 
-                // O \
-                console.log("----------Penché droit loin")
-                mission = gauche_leger
-            }else if(etat.dist[7] < 700 && etat.dist[10] < 600 && etat.dist[13] < 700 && grandEspace && suivreCoteGauche){//-----------------------------LOIN---------------------------
-                //   /
-                //  / 
-                // / O  
-                console.log("----------Penché gauche loin")
-                mission = droite_leger
-            } else if(etat.dist[1] < 500 && suivreCoteDroit){
-                //   |
-                // O |
-                //   |
-                console.log("----------Coté droit")
-                mission = avance
-            } else if(etat.dist[13] < 500 && suivreCoteGauche){
-                // | 
-                // | O
-                // |  
-                console.log("----------Coté gauche")
-                mission = avance
-            } else if(etat.dist[1] < 700 && grandEspace && suivreCoteDroit){//-----------------------------LOIN---------------------------
-                //   |
-                // O |
-                //   |
-                console.log("----------Coté droit loin")
-                mission = avance
-            } else if(etat.dist[13] < 700 && grandEspace && suivreCoteGauche){//-----------------------------LOIN---------------------------
-                // | 
-                // | O
-                // |  
-                console.log("----------Coté gauche loin")
-                mission = avance
-            } else if(etat.dist[4] < 500 && etat.dist[7] < 450 && etat.dist[10] < 500){
-                // _____
-                //   O
-                //  
-                console.log("----------Face")
-                if(etat.dist[1] <= etat.dist[13])
-                {
-                    mission = gauche
-                }else{
-                    mission = droite
-                }
-            }else {
-                console.log("----------Toupie/Avance")
-                //mission = toupie
-                mission = toupie
+            }else{
+                console.log("----------Cote Gauche")
+                soustractionGauche=etat.dist[10]-etat.dist[13]
+                mission = gauche
             }
             console.log("Effectue Mission")
             if (mission != null) mission(); // chaque fois qu'on reçoit une réponse de l'Arduino, on relance la mission
@@ -208,10 +151,21 @@ setTimeout(() => {
 }, 5000);
 
 ////////////////////////////////// custom mission /////////////////////////////////
+function wait(){
+    time = Date.now();
+    num = 0
+    usb.write("[[t 1000]]")
+    //mission = null
+    console.log("wait")
+    voir_autour_soit()
+    return
+
+}
+
 function voir_autour_soit() {
     time = Date.now();
     num = 0
-    usb.write("[[bl 0]]")
+    usb.write("[[bl 0][t 1000]]")
     //mission = null
     console.log("mission voir_autour_soit terminée")
     return
@@ -223,109 +177,53 @@ function avance(){
     usb.write("[[mga 170][mda 170][t 1000]]")
     //mission = null
     console.log("mission avance terminée")
+    //wait()
 }
 
 function gauche(){
-    if(tourne>0){
-        tourne=0
-        usb.write("[[mda 150][mga 150]]")
-        gauche()
-    }else{
-        tourne++
-        time = Date.now();
-        num = 0
-        usb.write("[[mda 170][mga 150]")
-        //mission = null
-        console.log("mission gauche terminée")
-    }
+
+    console.log("soustractionGauche : "+soustractionGauche)
+
+    soustractionGauche=(soustractionGauche/10)+150
+    if(soustractionGauche<0)soustractionGauche=soustractionGauche*-1
+    if(soustractionGauche>255 || soustractionGauche<150) soustractionGauche=150
+
+    console.log("[[mga "+soustractionGauche+"][mda 150]]")
+    usb.write("[[mga "+soustractionGauche+"][mda 150]]")     
     
 }
+
 
 function droite(){
-    if(tourne>0){
-        tourne=0
-        usb.write("[[mda 150][mga 150]]")
-        droite()
-    }else{
-        tourne++
-        time = Date.now();
-        num = 0
-        usb.write("[[mda 150][mga 170]]")
-        //mission = null
-        console.log("mission droite terminée")
-    }
+    
+    console.log("soustractionDroite : "+soustractionDroite)
+
+    soustractionDroite=(soustractionDroite/10)+150
+    if(soustractionDroite<0)soustractionDroite=soustractionDroite*-1
+    if(soustractionDroite>255 || soustractionDroite<150) soustractionDroite=150
+
+    console.log("[[mda "+soustractionDroite+"][mga 150]]")
+    usb.write("[[mda "+soustractionDroite+"][mga 150]]")
+        
 
 }
 
-function gauche2(){
-    time = Date.now();
-    num = 0
-    usb.write("[[mda 150]]")
-    //mission = null
-    console.log("mission gauche terminée")
-}
 
-function droite2(){
-    time = Date.now();
-    num = 0
-    usb.write("[[mga 250]]")
-    //mission = null
-    console.log("mission droite terminée")
-}
-
-function toupie(){
-    if(reculecompte==0){
-        if(toupiecompt>0) {
-            toupiecompt = 0
-            avance()
-        } else{
-            toupiecompt = toupiecompt +1
-            time = Date.now();
-            num = 0
-            usb.write("[[mga 150]]")
-            //mission = null
-            console.log("mission Toupie terminée")
-        }
-    }
-}
 
 function recule(){
-        if(reculecompte>0){
-            reculecompte=0
-            //voir_autour_soit()
-            avance()
-        }else{
-            time = Date.now();
-            num = 0
-            usb.write("[[mga 250][mdr 250]]")
-            //droite2()
-            //mission = null
-            console.log("mission recule terminée")
-            reculecompte++
-        }
-    
-    
-}
-
-function gauche_leger(){
-    time = Date.now();
-    num = 0
-    usb.write("[[mda 200][mga 150]]")
-    //avance()
-    //gauche()
-    //mission = null
-    console.log("mission gauche terminée")
-
+    if(reculecompte>0){
+        reculecompte=0
+        
+        avance()
+    }else{
+        time = Date.now();
+        num = 0
+        usb.write("[[mga 250][mdr 250]]")
+        
+        console.log("mission recule terminée")
+        reculecompte++
+    }
 }
 
 
-function droite_leger(){
-    time = Date.now();
-    num = 0
-    usb.write("[[mga 200][mda 150]]")
-    //avance()
-    //droite()
-    //mission = null
-    console.log("mission droite_leger terminée")
 
-}
