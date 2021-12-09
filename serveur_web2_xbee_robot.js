@@ -151,21 +151,11 @@ setTimeout(() => {
 }, 5000);
 
 ////////////////////////////////// custom mission /////////////////////////////////
-function wait(){
-    time = Date.now();
-    num = 0
-    usb.write("[[t 1000]]")
-    //mission = null
-    console.log("wait")
-    voir_autour_soit()
-    return
-
-}
 
 function voir_autour_soit() {
     time = Date.now();
     num = 0
-    usb.write("[[bl 0]]")
+    usb.write("[[bl 0][t 1000]]")
     //mission = null
     console.log("mission voir_autour_soit terminée")
     return
@@ -174,7 +164,7 @@ function voir_autour_soit() {
 function avance(){
     time = Date.now();
     num = 0
-    usb.write("[[mga 170][mda 170],[t 1000]]")
+    usb.write("[[mga 170][mda 170][t 1000]]")
     //mission = null
     console.log("mission avance terminée")
     //wait()
@@ -188,8 +178,12 @@ function gauche(){
     if(soustractionGauche<0)soustractionGauche=soustractionGauche*-1
     if(soustractionGauche>255 || soustractionGauche<150) soustractionGauche=150
 
-    console.log("[[mga "+soustractionGauche+"][mda 150]]")
-    usb.write("[[mga "+soustractionGauche+"][mda 150]]")     
+    soustractionGauche = Math.round(soustractionGauche)
+
+    var v = "[[mga "+soustractionGauche+"][mda 150][t 1000]]"
+
+    console.log(v)
+    usb.write(v)     
     
 }
 
@@ -201,9 +195,13 @@ function droite(){
     soustractionDroite=(soustractionDroite/10)+150
     if(soustractionDroite<0)soustractionDroite=soustractionDroite*-1
     if(soustractionDroite>255 || soustractionDroite<150) soustractionDroite=150
+    
+    soustractionDroite = Math.round(soustractionDroite)
 
-    console.log("[[mda "+soustractionDroite+"][mga 150]]")
-    usb.write("[[mda "+soustractionDroite+"][mga 150]]")
+    var v = "[[mda "+soustractionDroite+"][mga 150][t 1000]]"
+
+    console.log(v)
+    usb.write(v)
         
 
 }
@@ -218,7 +216,7 @@ function recule(){
     }else{
         time = Date.now();
         num = 0
-        usb.write("[[mga 250][mdr 250]]")
+        usb.write("[[mga 250][mdr 250][t 1000]]")
         
         console.log("mission recule terminée")
         reculecompte++
